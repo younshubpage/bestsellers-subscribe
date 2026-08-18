@@ -1,0 +1,33 @@
+name: Crawl bestseller data
+
+on:
+  workflow_dispatch:      # 저장소 Actions 탭에서 수동으로 "Run workflow" 눌러서 테스트 가능
+  schedule:
+    - cron: "0 21 * * *"  # 매일 UTC 21:00 = 한국시간 06:00
+
+permissions:
+  contents: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run crawlers
+        run: |
+          python scripts/crawl_kyobo.py
+          python scripts/crawl_millie.py
+          python scripts/crawl_cremaclub.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --quiet --cached || git commit -m "chore: update bestseller data $(date -u +%Y-%m-%d)"
+          git push
