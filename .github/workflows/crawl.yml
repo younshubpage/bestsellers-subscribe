@@ -30,6 +30,36 @@ jobs:
         continue-on-error: true
         run: python scripts/crawl_cremaclub.py
 
+      - name: Build merged JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          files = {
+              "cremaclub": "data/cremaclub_today.json",
+              "kyobo_premium": "data/kyobo_premium_today.json",
+              "kyobo_unlimited": "data/kyobo_unlimited_today.json",
+              "millie": "data/millie_today.json",
+          }
+
+          merged = {}
+
+          for name, file_path in files.items():
+              path = Path(file_path)
+
+              if path.exists():
+                  with path.open("r", encoding="utf-8") as f:
+                      merged[name] = json.load(f)
+              else:
+                  merged[name] = []
+
+          with open("data/merged.json", "w", encoding="utf-8") as f:
+              json.dump(merged, f, ensure_ascii=False, indent=2)
+
+          print("merged.json created")
+          PY
+
       - name: Commit results
         if: always()
         run: |
