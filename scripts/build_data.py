@@ -19,28 +19,23 @@ def load_json(path):
         print(f"[WARN] 파일 없음: {path}")
         return []
 
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        if not isinstance(data, list):
+            print(f"[WARN] 리스트 형식이 아님: {path}")
+            return []
+
+        return data
+
+    except Exception as e:
+        print(f"[ERROR] JSON 읽기 실패: {path}")
+        print(e)
+        return []
 
 
-def make_book_key(title, author):
-    """
-    제목과 저자를 원본 그대로 사용해서 책을 식별한다.
-
-    중요:
-    - 띄어쓰기 차이 → 다른 책
-    - 괄호 차이 → 다른 책
-    - 오탈자 → 다른 책
-    - 지음/저 등의 표기 차이 → 다른 책
-    - 저자명 차이 → 다른 책
-
-    즉, title과 author가 모두 완전히 동일한 경우에만
-    같은 책으로 인식한다.
-    """
-    return f"{title}|{author}"
-
-
-def load_store(store_key, path):
+def load_store(path):
     raw = load_json(path)
 
     result = []
@@ -53,92 +48,58 @@ def load_store(store_key, path):
         if not title or rank is None:
             continue
 
+        try:
+            rank = int(rank)
+        except:
+            continue
+
+        # 각 사이트별 1~20위만 사용
+        if rank < 1 or rank > 20:
+            continue
+
         result.append({
-            "rank": int(rank),
+            "rank": rank,
             "title": title,
-            "author": author,
+            "author": author
         })
 
-    return result
+    # 순위순 정렬
+    result.sort(key=lambda x: x["rank"])
+
+    return result[:20]
 
 
 def build():
-    stores = {}
 
-    # 각 서비스 데이터 불러오기
-    for key, path in SOURCES.items():
-        stores[key] = load_store(key, path)
-        print(f"{key}: {len(stores[key])}권")
+    data = {}
 
-    # 책들을 하나로 합침
-    books = {}
+    for store_key, path in SOURCES.items():
 
-    for store_key, items in stores.items():
-        for item in items:
+        books = load_store(path)
 
-            # ★ 제목 + 저자 원본값 그대로 비교
-            key = make_book_key(
-                item["title"],
-                item["author"]
-            )
+        data[store_key] = books
 
-            if key not in books:
-                books[key] = {
-                    "isbn": key,
-                    "title": item["title"],
-                    "author": item["author"],
-                    "pub": "",
-                }
+        print(f"{store_key}: {len(books)}권")
 
-            books[key][store_key] = {
-                "t": item["rank"],
-                "p": None,
-            }
-
-    # 현재 순위 기준으로 전체 책 정렬
-    book_list = list(books.values())
-
-    book_list.sort(
-        key=lambda b: min(
-            [
-                b[s]["t"]
-                for s in SOURCES
-                if s in b
-            ]
-        )
-    )
-
-    # 최대 20권
-    book_list = book_list[:20]
-
-    # 데이터 구조
-    data = {
-        "all": {
-            "books": book_list
-        }
-    }
-
-    # 현재 날짜
     today = datetime.now().strftime("%Y-%m-%d")
+    prev = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
     result = {
         "today": today,
-        "prev": (
-            datetime.now() - timedelta(days=1)
-        ).strftime("%Y-%m-%d"),
-        "surge_gap": 4,
+        "prev": prev,
 
         "categories": [
             {
-                "id": "all",
-                "label": "전체"
+                "id": "comparison",
+                "label": "사이트별 TOP 20"
             }
         ],
 
-        "data": data
+        "data": {
+            "comparison": data
+        }
     }
 
-    # data.json 저장
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(
             result,
@@ -147,9 +108,12 @@ def build():
             indent=2
         )
 
+    print("")
     print("[OK] data.json 생성 완료")
-    print(f"[OK] 책 수: {len(book_list)}")
     print(f"[OK] 날짜: {today}")
+
+    for key, books in data.items():
+        print(f"[OK] {key}: {len(books)}권")
 
 
 if __name__ == "__main__":
