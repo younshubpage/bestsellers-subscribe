@@ -1344,7 +1344,6 @@ const STORES = [
 
 /* =========================================================
    기본 샘플 데이터
-   실제 data.json 로드 성공 시 완전히 교체됨
 ========================================================= */
 
 const BOOK_META = [
@@ -1394,14 +1393,18 @@ const CAT_DEFS = [
 ========================================================= */
 
 function seeded(str){
+
   let h=2166136261;
 
   for(let i=0;i<str.length;i++){
+
     h^=str.charCodeAt(i);
     h=Math.imul(h,16777619);
+
   }
 
   return h>>>0;
+
 }
 
 
@@ -1412,6 +1415,7 @@ function buildSampleDataset(){
 
   const allBooks=BOOK_META.map(m=>({...m}));
 
+
   storeKeys.forEach(s=>{
 
     const order=[...allBooks].sort(
@@ -1420,24 +1424,32 @@ function buildSampleDataset(){
         seeded(b.title+"all"+s+"o")%1000
     );
 
+
     order.forEach((b,i)=>{
 
       const t=i+1;
 
-      const pr=seeded(
-        b.title+"all"+s+"p"
-      )%6;
+      const pr=
+        seeded(
+          b.title+"all"+s+"p"
+        )%6;
+
 
       b[s]={
         t,
         p:
           pr===0
-            ? null
-            : Math.max(
+            ?null
+            :Math.max(
                 1,
                 Math.min(
                   20,
-                  t+(seeded(b.title+"all"+s+"d")%9-4)
+                  t+
+                  (
+                    seeded(
+                      b.title+"all"+s+"d"
+                    )%9-4
+                  )
                 )
               )
       };
@@ -1445,6 +1457,7 @@ function buildSampleDataset(){
     });
 
   });
+
 
   data.all={
     books:allBooks
@@ -1458,7 +1471,10 @@ function buildSampleDataset(){
       const picks=
         BOOK_META
           .filter(
-            b=>seeded(b.title+c.id)%10<7
+            b=>
+              seeded(
+                b.title+c.id
+              )%10<7
           )
           .map(b=>{
 
@@ -1474,6 +1490,7 @@ function buildSampleDataset(){
             );
 
             return nb;
+
           });
 
 
@@ -1481,14 +1498,23 @@ function buildSampleDataset(){
 
         const present=
           picks.filter(
-            b=>seeded(b.title+c.id+s)%3!==0
+            b=>
+              seeded(
+                b.title+c.id+s
+              )%3!==0
           );
+
 
         present.sort(
           (a,b)=>
-            seeded(a.title+c.id+s+"o")%1000 -
-            seeded(b.title+c.id+s+"o")%1000
+            seeded(
+              a.title+c.id+s+"o"
+            )%1000 -
+            seeded(
+              b.title+c.id+s+"o"
+            )%1000
         );
+
 
         present
           .slice(0,20)
@@ -1501,16 +1527,20 @@ function buildSampleDataset(){
                 b.title+c.id+s+"p"
               )%6;
 
+
             b[s]={
               t,
               p:
                 pr===0
-                  ? null
-                  : Math.max(
+                  ?null
+                  :Math.max(
                       1,
-                      t+(seeded(
-                        b.title+c.id+s+"d"
-                      )%9-4)
+                      t+
+                      (
+                        seeded(
+                          b.title+c.id+s+"d"
+                        )%9-4
+                      )
                     )
             };
 
@@ -1520,15 +1550,20 @@ function buildSampleDataset(){
 
 
       data[c.id]={
-        books:picks.filter(
-          b=>storeKeys.some(k=>b[k])
-        )
+        books:
+          picks.filter(
+            b=>
+              storeKeys.some(
+                k=>b[k]
+              )
+          )
       };
 
     });
 
 
   return data;
+
 }
 
 
@@ -1564,14 +1599,18 @@ let STORE_BOOKS=[];
 ========================================================= */
 
 function storeCount(b){
+
   return STORES.filter(
     s=>b && b[s.key]
   ).length;
+
 }
 
 
 function viewLimit(){
+
   return 20;
+
 }
 
 
@@ -1583,15 +1622,20 @@ function movement(rank){
 
   if(!rank) return null;
 
+
   if(rank.p===null){
+
     return {
       type:"new",
       diff:null,
       surge:rank.t<=10
     };
+
   }
 
+
   const diff=rank.p-rank.t;
+
 
   const type=
     diff>0
@@ -1600,11 +1644,13 @@ function movement(rank){
         ?"down"
         :"same";
 
+
   return {
     type,
     diff,
     surge:diff>=SURGE_GAP
   };
+
 }
 
 
@@ -1612,24 +1658,33 @@ function moveLabel(m){
 
   if(!m) return "";
 
+
   if(m.type==="new"){
+
     return `<span class="chip new">NEW</span>`;
+
   }
 
+
   if(m.type==="same"){
+
     return `<span class="arrow same">–</span>`;
+
   }
+
 
   const ar=
     m.type==="up"
       ?"▲"
       :"▼";
 
+
   return `
     <span class="arrow ${m.type}">
       ${ar}${Math.abs(m.diff)}
     </span>
   `;
+
 }
 
 
@@ -1672,10 +1727,13 @@ function renderStores(){
         )
         .sort(
           (a,b)=>
-            Number(a[s.key].t) -
+            Number(a[s.key].t)-
             Number(b[s.key].t)
         )
-        .slice(0,viewLimit());
+        .slice(
+          0,
+          viewLimit()
+        );
 
 
     let inner;
@@ -1685,6 +1743,7 @@ function renderStores(){
     if(items.length===0){
 
       cntLabel="–";
+
 
       if(!storeHasAnyData(s.key)){
 
@@ -1721,10 +1780,12 @@ function renderStores(){
         const surge=
           m && m.surge;
 
+
         const cross=
           storeCount(b)>=2
-            ? `<span class="cross">${storeCount(b)}사</span>`
+            ?`<span class="cross">${storeCount(b)}사</span>`
             :"";
+
 
         const bi=
           STORE_BOOKS.push(b)-1;
@@ -1754,7 +1815,9 @@ function renderStores(){
 
               ${
                 rank.ship
-                  ? `<div class="bk-ship">${escapeHtml(rank.ship)}</div>`
+                  ?`<div class="bk-ship">
+                      ${escapeHtml(rank.ship)}
+                    </div>`
                   :""
               }
 
@@ -1764,7 +1827,7 @@ function renderStores(){
 
               ${
                 surge
-                  ? `<span class="chip surge">급등</span>`
+                  ?`<span class="chip surge">급등</span>`
                   :""
               }
 
@@ -1773,6 +1836,7 @@ function renderStores(){
             </div>
 
           </li>
+
         `;
 
       });
@@ -1823,52 +1887,68 @@ function avgRank(b){
   const rs=
     STORES
       .map(
-        s=>b && b[s.key]
-          ? Number(b[s.key].t)
-          : null
+        s=>
+          b && b[s.key]
+            ?Number(b[s.key].t)
+            :null
       )
       .filter(
-        x=>x!==null && !Number.isNaN(x)
+        x=>
+          x!==null &&
+          !Number.isNaN(x)
       );
 
+
   if(!rs.length) return Infinity;
+
 
   return rs.reduce(
     (a,c)=>a+c,
     0
   )/rs.length;
+
 }
 
 
 function mCell(rank){
 
   if(!rank){
+
     return `<span class="m-na">–</span>`;
+
   }
+
 
   const m=movement(rank);
 
   let sm;
 
+
   if(m.type==="new"){
-    sm=`<span class="sm" style="color:var(--blue)">NEW</span>`;
-  }
 
-  else if(m.type==="same"){
+    sm=
+      `<span class="sm" style="color:var(--blue)">NEW</span>`;
+
+  }else if(m.type==="same"){
+
     sm=`<span class="sm">–</span>`;
-  }
 
-  else{
+  }else{
+
     sm=`
       <span class="sm">
         ${m.type==="up"?"▲":"▼"}${Math.abs(m.diff)}
       </span>
     `;
+
   }
+
 
   const shipHtml=
     rank.ship
-      ? `<span class="m-ship">${escapeHtml(rank.ship)}</span>`
+      ?`<span class="m-ship">
+          ${escapeHtml(rank.ship)}
+        </span>`
       :"";
 
 
@@ -1881,13 +1961,17 @@ function mCell(rank){
       ${shipHtml}
     </span>
   `;
+
 }
 
 
 function renderMerged(){
 
   const body=
-    document.getElementById("merged-body");
+    document.getElementById(
+      "merged-body"
+    );
+
 
   body.innerHTML="";
 
@@ -1895,9 +1979,13 @@ function renderMerged(){
   const sorted=
     [...books]
       .sort(
-        (a,b)=>avgRank(a)-avgRank(b)
+        (a,b)=>
+          avgRank(a)-avgRank(b)
       )
-      .slice(0,viewLimit());
+      .slice(
+        0,
+        viewLimit()
+      );
 
 
   MERGED_BOOKS=sorted;
@@ -1907,19 +1995,22 @@ function renderMerged(){
 
     const anySurge=
       STORES.some(s=>{
+
         const m=
           movement(
             b[s.key]
           );
 
         return m && m.surge;
+
       });
 
 
     const storeTds=
       STORES
         .map(
-          s=>`<td>${mCell(b[s.key])}</td>`
+          s=>
+            `<td>${mCell(b[s.key])}</td>`
         )
         .join("");
 
@@ -2002,18 +2093,22 @@ async function loadHistory(){
     return HISTORY;
   }
 
+
   try{
 
     const r=
       await fetch(
         "./history.json?v="+Date.now(),
-        {cache:"no-store"}
+        {
+          cache:"no-store"
+        }
       );
+
 
     HISTORY=
       r.ok
-        ? await r.json()
-        : false;
+        ?await r.json()
+        :false;
 
   }catch(e){
 
@@ -2021,7 +2116,9 @@ async function loadHistory(){
 
   }
 
+
   return HISTORY;
+
 }
 
 
@@ -2030,9 +2127,11 @@ function dateSpanDays(dates){
   return dates.length<2
     ?0
     :(new Date(
-      dates[dates.length-1]
-    )-
-      new Date(dates[0]))
+        dates[dates.length-1]
+      )-
+      new Date(
+        dates[0]
+      ))
       /86400000;
 
 }
@@ -2075,14 +2174,15 @@ async function openBook(book){
 
   histState.data=
     h && book.hkey
-      ? (h.books[book.hkey]||null)
-      : null;
+      ?(h.books[book.hkey]||null)
+      :null;
 
 
   const curBtn=
     document.getElementById(
       "bk-cat-cur"
     );
+
 
   const curCat=
     CATEGORIES.find(
@@ -2104,7 +2204,10 @@ async function openBook(book){
         ?curCat.label
         :currentCat;
 
-    curBtn.dataset.cat=currentCat;
+
+    curBtn.dataset.cat=
+      currentCat;
+
 
     curBtn.style.display="";
 
@@ -2118,17 +2221,22 @@ async function openBook(book){
   if(h){
 
     const span=
-      dateSpanDays(h.dates||[]);
+      dateSpanDays(
+        h.dates||[]
+      );
+
 
     const p30=
       document.querySelector(
         '#bk-period-seg [data-p="30"]'
       );
 
+
     const p90=
       document.querySelector(
         '#bk-period-seg [data-p="90"]'
       );
+
 
     if(p30) p30.disabled=span<=7;
     if(p90) p90.disabled=span<=30;
@@ -2167,6 +2275,7 @@ function setHistCat(cat){
 
   histState.cat=cat;
 
+
   document.getElementById(
     "bk-cat-all"
   ).classList.toggle(
@@ -2174,12 +2283,14 @@ function setHistCat(cat){
     cat==="all"
   );
 
+
   document.getElementById(
     "bk-cat-cur"
   ).classList.toggle(
     "active",
     cat!=="all"
   );
+
 
   renderHist();
 
@@ -2189,6 +2300,7 @@ function setHistCat(cat){
 function setHistPeriod(p){
 
   histState.period=p;
+
 
   document
     .querySelectorAll(
@@ -2202,6 +2314,7 @@ function setHistPeriod(p){
         )
     );
 
+
   renderHist();
 
 }
@@ -2214,10 +2327,12 @@ function renderHist(){
       "bk-chart"
     );
 
+
   const leg=
     document.getElementById(
       "bk-legend"
     );
+
 
   const bk=
     histState.data;
@@ -2232,6 +2347,7 @@ function renderHist(){
       </div>
     `;
 
+
     leg.innerHTML="";
 
     return;
@@ -2242,6 +2358,7 @@ function renderHist(){
   const allDates=
     HISTORY.dates||[];
 
+
   if(!allDates.length){
 
     box.innerHTML=`
@@ -2249,6 +2366,7 @@ function renderHist(){
         아직 순위 히스토리가 없어요.
       </div>
     `;
+
 
     leg.innerHTML="";
 
@@ -2262,6 +2380,7 @@ function renderHist(){
       allDates[allDates.length-1]
     );
 
+
   cutoff.setDate(
     cutoff.getDate()-
     (histState.period-1)
@@ -2272,20 +2391,24 @@ function renderHist(){
     allDates
       .map((d,i)=>({d,i}))
       .filter(
-        o=>new Date(o.d)>=cutoff
+        o=>
+          new Date(o.d)>=cutoff
       );
 
 
   const dates=
     picked.map(o=>o.d);
 
+
   const idxs=
     picked.map(o=>o.i);
 
 
   const series=
-    (bk.series &&
-      bk.series[histState.cat])||{};
+    (
+      bk.series &&
+      bk.series[histState.cat]
+    )||{};
 
 
   box.innerHTML=
@@ -2315,6 +2438,7 @@ function renderHist(){
             .filter(
               v=>v!=null
             );
+
 
         allVals=
           allVals.concat(vals);
@@ -2356,6 +2480,7 @@ function segPath(pts){
 
   if(!pts.length) return "";
 
+
   return pts
     .map(
       (p,i)=>
@@ -2378,6 +2503,7 @@ function chartSVG(
   const W=620;
   const H=290;
 
+
   const pad={
     l:34,
     r:14,
@@ -2385,11 +2511,14 @@ function chartSVG(
     b:30
   };
 
+
   const iw=
     W-pad.l-pad.r;
 
+
   const ih=
     H-pad.t-pad.b;
+
 
   const n=
     dates.length;
@@ -2406,11 +2535,13 @@ function chartSVG(
           v &&
           idxs.indexOf(i)>=0
         ){
+
           maxRank=
             Math.max(
               maxRank,
               v
             );
+
         }
 
       })
@@ -2460,6 +2591,7 @@ function chartSVG(
         y2="${Y(r).toFixed(1)}"
         stroke="#EEEEEE"/>
     `;
+
 
     g+=`
       <text
@@ -2518,8 +2650,10 @@ function chartSVG(
     const arr=
       series[s.key]||[];
 
+
     const col=
       HIST_COLORS[s.key];
+
 
     let seg=[];
     let path="";
@@ -2529,6 +2663,7 @@ function chartSVG(
       (origIdx,pos)=>{
 
         const v=arr[origIdx];
+
 
         if(v==null){
 
@@ -2553,7 +2688,9 @@ function chartSVG(
 
 
     if(seg.length){
+
       path+=segPath(seg);
+
     }
 
 
@@ -2576,6 +2713,7 @@ function chartSVG(
       (origIdx,pos)=>{
 
         const v=arr[origIdx];
+
 
         if(v!=null){
 
@@ -2632,15 +2770,18 @@ function attachChartHover(){
       "bk-chart-wrap"
     );
 
+
   const svg=
     document.querySelector(
       "#bk-chart svg"
     );
 
+
   const tip=
     document.getElementById(
       "bk-tip"
     );
+
 
   const guide=
     document.getElementById(
@@ -2668,11 +2809,13 @@ function attachChartHover(){
     const rect=
       svg.getBoundingClientRect();
 
+
     if(!rect.width) return;
 
 
     const scale=
       rect.width/M.W;
+
 
     const svgX=
       (cx-rect.left)/scale;
@@ -2693,6 +2836,7 @@ function attachChartHover(){
           Xpos(p)-svgX
         );
 
+
       if(dd<best){
 
         best=dd;
@@ -2706,8 +2850,10 @@ function attachChartHover(){
     const px=
       Xpos(pos)*scale;
 
+
     const day=
       M.dates[pos];
+
 
     const oi=
       M.idxs[pos];
@@ -2720,6 +2866,7 @@ function attachChartHover(){
 
       const v=
         (M.series[s.key]||[])[oi];
+
 
       if(v!=null){
 
@@ -2757,8 +2904,10 @@ function attachChartHover(){
     guide.style.left=
       px+"px";
 
+
     guide.style.height=
       rect.height+"px";
+
 
     guide.style.display=
       "block";
@@ -2770,6 +2919,7 @@ function attachChartHover(){
 
     const ww=
       wrap.clientWidth;
+
 
     const tw=
       tip.offsetWidth;
@@ -2784,6 +2934,7 @@ function attachChartHover(){
         )
       )+"px";
 
+
     tip.style.top="6px";
 
   }
@@ -2792,7 +2943,6 @@ function attachChartHover(){
   function hide(){
 
     tip.style.display="none";
-
     guide.style.display="none";
 
   }
@@ -2803,31 +2953,42 @@ function attachChartHover(){
     e=>show(e.clientX)
   );
 
+
   svg.addEventListener(
     "mouseleave",
     hide
   );
 
+
   svg.addEventListener(
     "touchstart",
     e=>{
+
       if(e.touches[0]){
+
         show(
           e.touches[0].clientX
         );
+
       }
+
     },
     {passive:true}
   );
 
+
   svg.addEventListener(
     "touchmove",
     e=>{
+
       if(e.touches[0]){
+
         show(
           e.touches[0].clientX
         );
+
       }
+
     },
     {passive:true}
   );
@@ -2843,13 +3004,16 @@ function moveText(m){
 
   if(!m) return "";
 
+
   if(m.type==="new"){
     return "NEW";
   }
 
+
   if(m.type==="same"){
     return "–";
   }
+
 
   return (
     m.type==="up"
@@ -2878,6 +3042,7 @@ function exportExcel(){
     CATEGORIES.find(
       c=>c.id===currentCat
     );
+
 
   const catLabel=
     cat
@@ -2919,7 +3084,10 @@ function exportExcel(){
               Number(a[s.key].t)-
               Number(b[s.key].t)
           )
-          .slice(0,lim)
+          .slice(
+            0,
+            lim
+          )
     );
 
 
@@ -2960,9 +3128,11 @@ function exportExcel(){
       ""
     );
 
+
     SUB.forEach(
       h=>r1.push(h)
     );
+
 
     if(i<STORES.length-1){
 
@@ -2996,6 +3166,7 @@ function exportExcel(){
         const rk=
           b[STORES[i].key];
 
+
         row.push(
           rk.t,
           b.title||"",
@@ -3022,7 +3193,9 @@ function exportExcel(){
 
 
       if(i<STORES.length-1){
+
         row.push("");
+
       }
 
     });
@@ -3057,6 +3230,7 @@ function exportExcel(){
       }
     });
 
+
     c+=BLK+GAP;
 
   });
@@ -3076,8 +3250,11 @@ function exportExcel(){
       {wch:9}
     );
 
+
     if(i<STORES.length-1){
+
       cols.push({wch:2});
+
     }
 
   });
@@ -3132,6 +3309,7 @@ function setView(v){
     VIEW_DATE=
       DATA_TODAY;
 
+
     refreshDateUI();
 
   }
@@ -3139,12 +3317,14 @@ function setView(v){
 
   currentView=v;
 
+
   document.getElementById(
     "btn-store"
   ).classList.toggle(
     "active",
     v==="store"
   );
+
 
   document.getElementById(
     "btn-merged"
@@ -3213,8 +3393,11 @@ function isPast(){
 async function ensureHistory(){
 
   if(HISTORY===null){
+
     await loadHistory();
+
   }
+
 
   setupDateNav();
 
@@ -3224,7 +3407,9 @@ async function ensureHistory(){
 function setupDateNav(){
 
   if(!VIEW_DATE){
+
     VIEW_DATE=DATA_TODAY;
+
   }
 
 
@@ -3244,6 +3429,7 @@ function setupDateNav(){
   ){
 
     inp.min=ds[0];
+
     inp.max=
       ds[ds.length-1];
 
@@ -3266,20 +3452,24 @@ function refreshDateUI(){
       "date-cur"
     );
 
+
   const prev=
     document.getElementById(
       "date-prev"
     );
+
 
   const next=
     document.getElementById(
       "date-next"
     );
 
+
   const back=
     document.getElementById(
       "back-today"
     );
+
 
   const vs=
     document.getElementById(
@@ -3311,6 +3501,7 @@ function refreshDateUI(){
           ?'<span class="past-badge">과거</span>'
           :""
       );
+
 
     cur.style.cursor=
       navOn
@@ -3354,6 +3545,7 @@ function refreshDateUI(){
       ".legend"
     );
 
+
   if(lg){
 
     lg.style.display=
@@ -3380,6 +3572,7 @@ function applyDate(date){
 
   VIEW_DATE=
     date||DATA_TODAY;
+
 
   refreshDateUI();
 
@@ -3413,7 +3606,9 @@ async function stepDate(dir){
 
 
   if(i<0){
+
     i=ds.length-1;
+
   }
 
 
@@ -3425,7 +3620,9 @@ async function stepDate(dir){
     ni<0 ||
     ni>=ds.length
   ){
+
     return;
+
   }
 
 
@@ -3449,7 +3646,9 @@ async function openDatePicker(){
     !HISTORY ||
     ds.length<2
   ){
+
     return;
+
   }
 
 
@@ -3502,7 +3701,9 @@ function nearestAvailable(val){
 
 
   if(ds.includes(val)){
+
     return val;
+
   }
 
 
@@ -3514,7 +3715,9 @@ function nearestAvailable(val){
   ){
 
     if(d<=val){
+
       best=d;
+
     }
 
   }
@@ -3538,10 +3741,12 @@ function renderPast(){
       "store"
     );
 
+
   const mergedEl=
     document.getElementById(
       "merged"
     );
+
 
   const xbtn=
     document.getElementById(
@@ -3550,16 +3755,21 @@ function renderPast(){
 
 
   if(xbtn){
+
     xbtn.style.display="none";
+
   }
 
 
   if(mergedEl){
+
     mergedEl.style.display="none";
+
   }
 
 
   storeEl.style.display="";
+
 
   renderStoresForDate(
     VIEW_DATE
@@ -3613,7 +3823,9 @@ function renderStoresForDate(date){
           !ser ||
           !ser[s.key]
         ){
+
           continue;
+
         }
 
 
@@ -3659,6 +3871,7 @@ function renderStoresForDate(date){
     if(!items.length){
 
       cnt="–";
+
 
       inner=`
         <div class="col-msg">
@@ -3972,41 +4185,164 @@ async function init(){
 
 
     /*
-     * 핵심 수정:
-     * 실제 data.json의 구조를 확인하고
-     * data.data / data.categories가 있을 때만
-     * 실제 데이터를 적용한다.
+     * 실제 data.json 구조
+     *
+     * data.data.comparison
+     *   ├ cremaclub
+     *   ├ millie
+     *   ├ sam_premium
+     *   └ sam_unlimited
+     *
+     * 각각 20권씩 존재함.
+     *
+     * 기존 화면은
+     *
+     * DATASET.all.books = [
+     *   {
+     *     title,
+     *     author,
+     *     cremaclub:{t,p},
+     *     millie:{t,p},
+     *     ...
+     *   }
+     * ]
+     *
+     * 구조를 사용하므로
+     * 여기서 실제 JSON을 화면용 구조로 변환한다.
      */
 
     if(
       data &&
       data.data &&
-      typeof data.data==="object"
+      data.data.comparison &&
+      typeof data.data.comparison==="object"
     ){
 
-      DATASET=
-        data.data;
+      const comparison=
+        data.data.comparison;
 
 
-      if(
-        Array.isArray(
-          data.categories
-        ) &&
-        data.categories.length
-      ){
-
-        CATEGORIES=
-          data.categories;
-
-      }
+      const merged={};
 
 
-      currentCat=
-        CATEGORIES[0]
-          ?CATEGORIES[0].id
-          :"all";
+      /*
+       * 사이트별 TOP20을 하나의 books 배열로 합친다.
+       *
+       * 같은 제목은 같은 책으로 묶고,
+       * 각 사이트의 순위를 붙인다.
+       */
+
+      Object.entries(
+        comparison
+      ).forEach(
+        ([storeKey,list])=>{
+
+          if(!Array.isArray(list)){
+            return;
+          }
 
 
+          list.forEach(book=>{
+
+            const title=
+              String(
+                book.title||""
+              ).trim();
+
+
+            if(!title){
+              return;
+            }
+
+
+            /*
+             * 우선 제목을 기준으로
+             * 같은 책을 하나로 묶는다.
+             */
+            const bookKey=
+              title.toLowerCase();
+
+
+            if(!merged[bookKey]){
+
+              merged[bookKey]={
+                isbn:bookKey,
+                title:title,
+                author:book.author||"",
+                pub:book.pub||""
+              };
+
+            }
+
+
+            /*
+             * 실제 data.json의 rank를
+             * 화면에서 사용하는 t(rank)로 변환
+             */
+            merged[bookKey][storeKey]={
+              t:Number(book.rank),
+              p:null
+            };
+
+
+            /*
+             * data.json에 나중에 전일 순위가
+             * 들어오더라도 사용할 수 있도록
+             * prevRank 형태도 지원
+             */
+            if(
+              book.prevRank!==undefined &&
+              book.prevRank!==null
+            ){
+
+              merged[bookKey][storeKey].p=
+                Number(book.prevRank);
+
+            }
+
+          });
+
+        }
+      );
+
+
+      /*
+       * 최종 화면용 books 배열
+       */
+      const comparisonBooks=
+        Object.values(
+          merged
+        );
+
+
+      /*
+       * 실제 사이트 데이터로 DATASET 교체
+       */
+      DATASET={
+        all:{
+          books:comparisonBooks
+        }
+      };
+
+
+      /*
+       * 현재 JSON에는 카테고리가 없으므로
+       * "사이트별 TOP 20" 하나만 사용
+       */
+      CATEGORIES=[
+        {
+          id:"all",
+          label:"사이트별 TOP 20"
+        }
+      ];
+
+
+      currentCat="all";
+
+
+      /*
+       * 급등 기준이 JSON에 있으면 적용
+       */
       if(
         typeof data.surge_gap==="number"
       ){
@@ -4017,6 +4353,9 @@ async function init(){
       }
 
 
+      /*
+       * 날짜
+       */
       DATA_TODAY=
         data.today||
         "";
@@ -4026,6 +4365,9 @@ async function init(){
         DATA_TODAY;
 
 
+      /*
+       * 전일 표시
+       */
       LIVE_VS=
         data.prev
           ?`전날(${fmtDate(data.prev)}) 대비 순위 변동`
@@ -4033,6 +4375,12 @@ async function init(){
 
 
       loaded=true;
+
+
+      console.log(
+        "실제 data.json 로드 성공",
+        comparisonBooks
+      );
 
     }
 
@@ -4047,12 +4395,9 @@ async function init(){
 
 
   /*
-   * 실제 데이터가 없을 경우:
-   * 화면 시안용 샘플 데이터 유지.
-   * 단, 실제 배포에서는 콘솔에서
-   * data.json 로드 실패 여부 확인 가능.
+   * 실제 data.json을 못 읽었을 경우
+   * 기존 샘플 데이터 유지
    */
-
   if(!loaded){
 
     DATA_TODAY=
@@ -4060,6 +4405,7 @@ async function init(){
       new Date()
         .toISOString()
         .slice(0,10);
+
 
     VIEW_DATE=
       DATA_TODAY;
@@ -4098,10 +4444,9 @@ async function init(){
 
 
   /*
-   * 실제 data.json을 사용했다면
-   * SAMPLE 표시를 제거한다.
+   * 실제 데이터 사용 시
+   * 샘플 표시 제거
    */
-
   if(loaded){
 
     const tag=
@@ -4109,23 +4454,28 @@ async function init(){
         "sample-tag"
       );
 
+
     if(tag){
+
       tag.remove();
+
     }
 
   }
 
 
+  /*
+   * 카테고리 및 메인 화면 출력
+   */
   renderCategoryBar();
 
   render();
 
 
   /*
-   * 과거 날짜 데이터는
-   * 화면을 막지 않도록 백그라운드 로드
+   * 과거 날짜 히스토리는
+   * 백그라운드에서 로드
    */
-
   loadHistory()
     .then(()=>{
       setupDateNav();
@@ -4133,6 +4483,10 @@ async function init(){
 
 }
 
+
+/* =========================================================
+   시작
+========================================================= */
 
 init();
 
