@@ -13,9 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -32,17 +35,8 @@ jobs:
         run: python scripts/crawl_cremaclub.py
 
       - name: Build data.json
-        run: python scripts/build_data.py
-
-      - name: Check data.json
         run: |
-          if [ -f data.json ]; then
-            echo "data.json created successfully"
-            ls -lh data.json
-          else
-            echo "ERROR: data.json was not created"
-            exit 1
-          fi
+          python scripts/build_data.py
 
       - name: Commit results
         if: always()
@@ -52,9 +46,6 @@ jobs:
 
           git add data/ data.json
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: update bestseller data $(date -u +%Y-%m-%d)"
-            git push
-          fi
+          git diff --quiet --cached || git commit -m "chore: update bestseller data $(date -u +%Y-%m-%d)"
+
+          git push
