@@ -21,20 +21,17 @@ def fetch_html():
     with urllib.request.urlopen(req, timeout=15) as res:
         return res.read().decode("utf-8", errors="replace")
 
-# 한 권 블록 예시:
-#   <img alt="오뒷세이아" ...>
-#   <li class="Num">1</li>
-#   <a ...>오뒷세이아</a>
-#   <p class="Author">호메로스 저/천병희 역 저</p>
-BOOK_BLOCK = re.compile(
-    r'"Num">\s*(\d+)\s*<.*?<a[^>]*>\s*([^<]+?)\s*</a>\s*.*?"Author">\s*([^<]+?)\s*<',
-    re.DOTALL
-)
+RANK_RE = re.compile(r'<div class="info_row info_rank">\s*<em>(\d+)</em>')
+TITLE_RE = re.compile(r'<a class="gd_name"[^>]*>([^<]+)</a>')
+AUTHOR_RE = re.compile(r'<span class="authPub info_auth">\s*([^<]+?)\s*</span>')
 
 def extract_books(html, limit=20):
+    ranks = RANK_RE.findall(html)
+    titles = TITLE_RE.findall(html)
+    authors = AUTHOR_RE.findall(html)
+
     books = []
-    for m in BOOK_BLOCK.finditer(html):
-        rank, title, author = m.groups()
+    for rank, title, author in zip(ranks, titles, authors):
         books.append({
             "rank": int(rank),
             "title": title.strip(),
@@ -47,7 +44,6 @@ def extract_books(html, limit=20):
 def main():
     os.makedirs("data", exist_ok=True)
     html = fetch_html()
-    # 원본도 같이 저장 (파싱 실패 시 구조 확인용)
     with open("data/raw_cremaclub.html", "w", encoding="utf-8") as f:
         f.write(html)
     books = extract_books(html)
