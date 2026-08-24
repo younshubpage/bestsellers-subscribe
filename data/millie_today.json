@@ -6,43 +6,43 @@
   },
   {
     "rank": 2,
-    "title": "명화잡사",
-    "author": "김태진"
-  },
-  {
-    "rank": 3,
     "title": "오디세이아 (영화 <오디세이> 원작)",
     "author": "호메로스 지음"
   },
   {
-    "rank": 4,
+    "rank": 3,
     "title": "만화로 보는 그리스 로마 신화 1",
     "author": "토머스불핀치 지음, 이광진 옮김"
   },
   {
-    "rank": 5,
+    "rank": 4,
     "title": "세입자",
     "author": "프리다 맥파든 지음"
   },
   {
-    "rank": 6,
-    "title": "기대의 감각",
-    "author": "김지용"
-  },
-  {
-    "rank": 7,
+    "rank": 5,
     "title": "독하게 돈 공부",
     "author": "박소연"
   },
   {
+    "rank": 6,
+    "title": "낙하",
+    "author": "이희영"
+  },
+  {
+    "rank": 7,
+    "title": "비스킷",
+    "author": "김선미"
+  },
+  {
     "rank": 8,
-    "title": "내면 근력",
-    "author": "짐 머피 지음"
+    "title": "안녕이라 그랬어",
+    "author": "김애란"
   },
   {
     "rank": 9,
-    "title": "오뒷세이아",
-    "author": "호메로스 지음"
+    "title": "굿 게임 굿 럭",
+    "author": "장강명, 전건우, 정명섭, 정해연, 조영주"
   },
   {
     "rank": 10,
@@ -56,33 +56,33 @@
   },
   {
     "rank": 12,
-    "title": "용의자 X의 헌신",
-    "author": "히가시노 게이고 지음"
+    "title": "내면 근력",
+    "author": "짐 머피 지음"
   },
   {
     "rank": 13,
-    "title": "나도 아직 나를 모른다",
-    "author": "허지원 지음"
+    "title": "명화잡사",
+    "author": "김태진"
   },
   {
     "rank": 14,
-    "title": "빵충 사육 준수 사항",
-    "author": "김혜영"
-  },
-  {
-    "rank": 15,
     "title": "테오",
     "author": "앨런 레비 지음"
   },
   {
+    "rank": 15,
+    "title": "용의자 X의 헌신",
+    "author": "히가시노 게이고 지음"
+  },
+  {
     "rank": 16,
-    "title": "안녕이라 그랬어",
-    "author": "김애란"
+    "title": "기대의 감각",
+    "author": "김지용"
   },
   {
     "rank": 17,
-    "title": "독하게 돈 공부",
-    "author": "박소연"
+    "title": "빵충 사육 준수 사항",
+    "author": "김혜영"
   },
   {
     "rank": 18,
@@ -91,12 +91,12 @@
   },
   {
     "rank": 19,
-    "title": "낙하",
-    "author": "이희영"
+    "title": "독서의 기술",
+    "author": "고명환"
   },
   {
     "rank": 20,
-    "title": "독서의 기술",
-    "author": "고명환"
+    "title": "독하게 돈 공부",
+    "author": "박소연"
   }
 ]
